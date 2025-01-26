@@ -2,6 +2,7 @@ let prompt=document.querySelector("#prompt")
 let btn=document.querySelector("#btn")
 let chatContainer=document.querySelector(".chat-container")
 let userMessage=null;
+let Api_Url="https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDaLOId44VU6gu3LzKOkWdrPbG3Q1kmIxo"
 
 function createChatBox(html,className){
     let div=document.createElement("div")
@@ -10,6 +11,28 @@ function createChatBox(html,className){
     return div
 }
 
+async function getApiResponse(aiChatBox){
+    try{
+        let response= await fetch(Api_Url,{
+            method:"POST",
+            headers:{'Content-Type': 'application/json'},
+            body:JSON.stringify({
+                contents:[
+                    {
+                        "role":"user",
+                        "parts":[{text:userMessage}]
+                    }
+                ]
+            })
+        })
+        let data=(await response).json();
+        let api_Response=data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        console.log(api_Response);
+    }
+    catch(error){
+        console.log(error)
+    }
+}
 function showLoading(){
     let html=`<div class="chatbot">
                 <img src="chatbot.png" alt="chatbot">
@@ -18,6 +41,7 @@ function showLoading(){
             <img src="loading.gif" alt="loading" class="loading">`
             let aiChatBox=createChatBox(html,"ai-chatbox")
             chatContainer.appendChild(aiChatBox)
+            getApiResponse(aiChatBox)
 }
 
 btn.addEventListener("click",()=>{
